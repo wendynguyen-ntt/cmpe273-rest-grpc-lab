@@ -1,6 +1,6 @@
 # CMPE273 Lab: REST vs. gRPC
 
-This Python lab implements the same Order → Inventory interaction using REST/HTTP and gRPC. An order contains an `item_id` and a `quantity`; Inventory checks whether that quantity is available.
+This Python lab implements the same Order → Inventory interaction using REST/HTTP and gRPC. An order contains an `item_id` and a `quantity`, Inventory checks whether that quantity is available.
 
 Both versions use two separately running services. Inventory starts with 10 notebooks and 20 pens. The lab checks availability only: it does not reserve stock, deduct stock, or persist orders.
 
@@ -13,7 +13,7 @@ Both versions require a nonempty string `item_id` and an integer `quantity` from
 | REST | `POST http://127.0.0.1:5002/orders` | HTTP POST to `http://127.0.0.1:5001/inventory/check`, using JSON |
 | gRPC | `POST http://127.0.0.1:5002/orders` | gRPC `InventoryService.CheckInventory` on `127.0.0.1:50051`, using Protocol Buffers |
 
-The gRPC version keeps Order's public HTTP endpoint so it can be tested with curl. Its internal Order → Inventory call is a real gRPC call, defined in `grpc_version/inventory.proto`. Order includes the actual RPC status in its JSON response as `grpc_status`.
+The gRPC version keeps Order's public HTTP endpoint so it can be tested with curl. Its internal Order → Inventory call is a real gRPC call as defined in `grpc_version/inventory.proto`. Order includes the actual RPC status in its JSON response as `grpc_status`.
 
 Order also exposes `GET /health` in both versions. Because the two Order implementations use the same port, stop one version before starting the other.
 
@@ -103,7 +103,7 @@ Inventory returns `400` for invalid JSON or invalid fields, `404` for an unknown
 
 ### REST timeout evidence
 
-Order sets `timeout=2` on its HTTP request to Inventory. This configures connection and read timeouts; it is not a single total-duration deadline for arbitrary HTTP responses.
+Order sets `timeout=2` on its HTTP request to Inventory. This configures connection and read timeouts, it is not a single total-duration deadline for arbitrary HTTP responses.
 
 In Terminal 1, press Control+C to stop only Inventory, then restart it with a five-second delay:
 
@@ -245,7 +245,7 @@ Inventory aborts the RPC with `FAILED_PRECONDITION` because the current stock ca
 | `DEADLINE_EXCEEDED` | RPC exceeded its deadline | `504` |
 | `UNAVAILABLE` | Inventory cannot be reached | `503` |
 
-Order validates public JSON input before constructing the typed request; those validation errors return HTTP `400` without making an RPC. Unexpected gRPC errors map to HTTP `502`.
+Order validates public JSON input before constructing the typed request. Those validation errors return HTTP `400` without making an RPC. Unexpected gRPC errors map to HTTP `502`.
 
 ### gRPC deadline evidence
 
@@ -276,7 +276,7 @@ HTTP/1.1 504 GATEWAY TIMEOUT
 Total time: 2.009160 seconds
 ```
 
-Order caught `grpc.RpcError` with `DEADLINE_EXCEEDED` and returned a controlled JSON error after about two seconds. The deliberate `time.sleep(5)` in Inventory may finish later; deadline expiration does not interrupt that Python sleep.
+Order caught `grpc.RpcError` with `DEADLINE_EXCEEDED` and returned a controlled JSON error after about two seconds. The deliberate `time.sleep(5)` in Inventory may finish later, deadline expiration does not interrupt that Python sleep.
 
 ### Order remained running after the gRPC deadline
 
@@ -312,4 +312,4 @@ The health check and successful new RPC-backed order demonstrate that Order cont
 
 ## REST vs. gRPC comparison
 
-REST used a JSON endpoint that I could test directly with curl. gRPC required a `.proto` contract and generated Python files, but gave Order a typed `CheckInventory` client method. Both implementations still needed business validation, such as checking that quantity was positive and enough stock existed. REST reported insufficient stock with HTTP `409`, whereas gRPC reported `FAILED_PRECONDITION`, which Order translated into HTTP `409` for its public endpoint. The Requests timeout limited connection and read waits, while the gRPC deadline limited the entire RPC. With a five-second Inventory delay, both versions returned controlled errors after about two seconds, and Order stayed running and accepted another order after Inventory recovered.
+REST used a JSON endpoint that I could test directly with curl. gRPC required a `.proto` contract and generated Python files but gave Order a typed `CheckInventory` client method. Both implementations still needed business validation such as checking that quantity was positive and enough stock existed. REST reported insufficient stock with HTTP `409`, whereas, gRPC reported `FAILED_PRECONDITION`, which Order translated into HTTP `409` for its public endpoint. The Requests timeout limited connection and read waits while the gRPC deadline limited the entire RPC. With a five-second Inventory delay, both versions returned controlled errors after about two seconds, and Order stayed running and accepted another order after Inventory recovered.
