@@ -2,7 +2,7 @@
 
 This Python lab implements the same Order → Inventory interaction using REST/HTTP and gRPC. An order contains an `item_id` and a `quantity`, Inventory checks whether that quantity is available.
 
-Both versions use two separately running services. Inventory starts with 10 notebooks and 20 pens. The lab checks availability only: it does not reserve stock, deduct stock, or persist orders.
+Both versions use two separately running services. Inventory starts with 10 notebooks and 20 pens. The lab checks availability only. It does not reserve stock, deduct stock, or persist orders.
 
 Both versions require a nonempty string `item_id` and an integer `quantity` from 1 through 2147483647, matching the gRPC contract's `int32` range.
 
