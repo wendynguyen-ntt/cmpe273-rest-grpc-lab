@@ -26,8 +26,8 @@ def check_inventory():
     if not isinstance(item_id, str) or not item_id.strip():
         return jsonify(message="item_id must be a nonempty string"), 400
 
-    if type(quantity) is not int or quantity <= 0:
-        return jsonify(message="quantity must be a positive integer"), 400
+    if type(quantity) is not int or quantity < 1 or quantity > 2147483647:
+        return jsonify(message="quantity must be a positive int32 integer"), 400
 
     if DELAY_SECONDS > 0:
         app.logger.warning(

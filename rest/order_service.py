@@ -17,6 +17,21 @@ def create_order():
             message="Request must be a JSON object",
         ), 400
 
+    item_id = data.get("item_id")
+    quantity = data.get("quantity")
+
+    if not isinstance(item_id, str) or not item_id.strip():
+        return jsonify(
+            status="rejected",
+            message="item_id must be a nonempty string",
+        ), 400
+
+    if type(quantity) is not int or not 0 < quantity <= 2147483647:
+        return jsonify(
+            status="rejected",
+            message="quantity must be a positive int32 integer",
+        ), 400
+
     try:
         response = requests.post(
             INVENTORY_URL,

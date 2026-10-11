@@ -4,6 +4,8 @@ This Python lab implements the same Order → Inventory interaction using REST/H
 
 Both versions use two separately running services. Inventory starts with 10 notebooks and 20 pens. The lab checks availability only: it does not reserve stock, deduct stock, or persist orders.
 
+Both versions require a nonempty string `item_id` and an integer `quantity` from 1 through 2147483647, matching the gRPC contract's `int32` range.
+
 ## Service interfaces
 
 | Version | Order interface | Order → Inventory communication |
@@ -125,7 +127,7 @@ HTTP/1.1 504 GATEWAY TIMEOUT
 
 {"message":"Inventory request timed out","status":"error"}
 
-Total time: 2.011730 seconds
+Total time: 2.009491 seconds
 ```
 
 Inventory delayed before sending its response, so Order's read timeout occurred after about two seconds. Order caught `requests.exceptions.Timeout` and returned a controlled JSON error.
@@ -271,7 +273,7 @@ HTTP/1.1 504 GATEWAY TIMEOUT
 
 {"grpc_status":"DEADLINE_EXCEEDED","message":"Deadline Exceeded","status":"error"}
 
-Total time: 2.011305 seconds
+Total time: 2.009160 seconds
 ```
 
 Order caught `grpc.RpcError` with `DEADLINE_EXCEEDED` and returned a controlled JSON error after about two seconds. The deliberate `time.sleep(5)` in Inventory may finish later; deadline expiration does not interrupt that Python sleep.
